@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const { nanoid } = require("nanoid");
+const path = require("path");
 const cors = require("cors");
 require("dotenv").config();
 
@@ -8,6 +9,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
+app.use(express.static(path.join(__dirname, "my-react-app/dist")));
 
 // connect to DB via mongoose
 mongoose
@@ -128,6 +130,10 @@ app.get("/healthz", (req, res) => {
     ok: true,
     version: "1.0",
   });
+});
+
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "my-react-app/dist", "index.html"));
 });
 
 app.listen(3000, () => {

@@ -6,7 +6,7 @@ const Stats = () => {
   const [stats, setStats] = useState("");
   const fetchStats = async (code) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/links/${code}`);
+      const response = await fetch(`/api/links/${code}`);
       const data = await response.json();
       console.log(data);
       setStats(data);

@@ -9,7 +9,7 @@ const Dashboard = () => {
   });
   const handleDelete = async (code) => {
     try {
-      await fetch(`http://localhost:3000/api/links/${code}`, {
+      await fetch(`/api/links/${code}`, {
         method: "DELETE",
       });
       fetchLinks();
@@ -18,7 +18,7 @@ const Dashboard = () => {
     }
   };
   const fetchLinks = () => {
-    fetch("http://localhost:3000/api/links")
+    fetch("/api/links")
       .then((res) => res.json())
       .then((data) => setLinks(data))
       .catch((error) => {
@@ -37,7 +37,7 @@ const Dashboard = () => {
     try {
       // e.preventDefault();
       const { targetUrl, shortCode } = formData;
-      const response = await fetch("http://localhost:3000/api/links", {
+      const response = await fetch("/api/links", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ targetUrl, shortCode }),
