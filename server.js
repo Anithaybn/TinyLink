@@ -1,11 +1,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const { nanoid } = require("nanoid");
+const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 // connect to DB via mongoose
 mongoose
@@ -52,17 +54,23 @@ app.get("/api/links", async (req, res) => {
 
 app.post("/api/links", async (req, res) => {
   try {
-    const { targetUrl } = req.body;
-    const shortCode = nanoid(7);
+    let { targetUrl, shortCode } = req.body;
+    // generate shortcode if not provided
+    if (!shortCode) shortCode = nanoid(7);
     const created = await shortUrl.create({ targetUrl, shortCode });
     const shortUrlCreated = `${req.protocol}://${req.get("host")}/${shortCode}`;
-    res.json({
+    res.status(200).json({
       message: "Short URL created",
       shortUrlCreated,
       data: created,
     });
   } catch (error) {
-    console.log("Error occurred while adding url to DB", error);
+    console.log("Error occurred while adding url to DB", error.message);
+    if (error.code === 11000) {
+      return res
+        .status(409)
+        .json({ message: "Short code already exists, please use another." });
+    }
     res.status(500).json({ message: "Error occurred" });
   }
 });
@@ -113,6 +121,13 @@ app.delete("/api/links/:code", async (req, res) => {
     console.log("Error occurred ", error);
     res.status(500).json({ message: "Error occurred" });
   }
+});
+
+app.get("/healthz", (req, res) => {
+  res.status(200).json({
+    ok: true,
+    version: "1.0",
+  });
 });
 
 app.listen(3000, () => {
